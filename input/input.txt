@@ -1,0 +1,7 @@
+#X 4                ; Maximum x coordinate
+#Y 3                ; Maximum y coordinate
+#P 0 0 0  D 4 3 50  ; Package at (0,0) from time 0, deliver to (4,0) on or before time 50
+#B 3 0 4 0          ; Edge from (3,0) to (4,0) is always blocked
+#B 2 2 2 3          ; Edge from (2,2) to (2,3) is always blocked
+#F 0 1 0 2 0.4      ; Edge from (0,1) to (0,2) is fragile, blocked with probability 0.4
+#A 0 0              ; Normal agent starts at (0,0)
