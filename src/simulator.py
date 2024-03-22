@@ -1,10 +1,12 @@
 from agents import Agent
 from state import State
+from utility_of_states import UtilityOfStates
 
 
 class Simulator:
-    def __init__(self, initial_state: State):
+    def __init__(self, initial_state: State, utility_of_states: UtilityOfStates):
         self.current_state = initial_state
+        self.utility_of_states = utility_of_states
         self.states = [self.current_state]
 
     def _goal_achieved(self):
@@ -31,8 +33,8 @@ class Simulator:
 
         while True:
             # Perform Agent Action
-            self.current_state = self.current_state.clone_state(agent_idx=agent_idx)
-            current_agent = Agent(state=self.current_state)
+            self.current_state = self.current_state.clone_state()
+            current_agent = Agent(state=self.current_state, utility_of_states=self.utility_of_states)
             self.current_state, action = current_agent.perform_action()
             self.states.append(self.current_state)
 
@@ -41,7 +43,7 @@ class Simulator:
             print(f"Agent {agent_idx} ({agent_type}) Action: {action}")
 
             # Raise clock by one
-            self.current_state = self.current_state.clone_state(agent_idx=agent_idx, time_factor=1)
+            self.current_state = self.current_state.clone_state(time_factor=1)
             self.current_state.update_packages_info()
             print(f"# Clock Time {self.current_state.time}:")
 

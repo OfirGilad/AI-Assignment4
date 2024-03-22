@@ -251,13 +251,6 @@ class State:
 
         self.perform_agent_step(current_vertex, next_vertex, mode=mode)
 
-    # TODO: Implement this method
-    def get_agent_policy(self):
-        agent_policy = {
-            "action": "Left"
-        }
-        return agent_policy
-
     def __str__(self):
         # Coordinates
         print_data = (
@@ -318,7 +311,7 @@ class State:
        
         return print_data
 
-    def clone_state(self, agent_idx: int, time_factor: float = 0):
+    def clone_state(self, agent_idx: int = 0, time_factor: float = 0):
         environment_data = {
             "x": self.X - 1,
             "y": self.Y - 1,
