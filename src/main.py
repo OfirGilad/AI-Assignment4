@@ -15,7 +15,7 @@ def run(data_filepath: str):
 
     # Init Utility of States
     utility_of_states = UtilityOfStates(initial_state=initial_state)
-    utility_of_states.calculate_states_utilities()
+    utility_of_states.preform_value_iteration()
 
     # Init Interface
     interface = Interface(initial_state=initial_state, utility_of_states=utility_of_states)
