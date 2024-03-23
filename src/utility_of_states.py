@@ -7,34 +7,87 @@ import numpy as np
 
 class UtilityOfStates:
     def __init__(self, initial_state: State):
-        self.initial_state = initial_state
-        self.unknown_edges = list(edge for edge in self.initial_state.special_edges if edge["type"] == "fragile")
+        # Remove agent location for checking available paths
+        self.state = initial_state.clone_state()
+        self.state.agents[0]["location"] = None
+
+        self.unknown_edges = list(edge for edge in self.state.special_edges if edge["type"] == "fragile")
         self.states_utilities = dict()
 
-    def _set_default_values(self):
-        X = self.initial_state.X
-        Y = self.initial_state.Y
+    def _set_initial_values(self, goal_location):
+        X = self.state.X
+        Y = self.state.Y
         all_vertices = list(list(vertex) for vertex in itertools.product(range(X), range(Y)))
         for vertex in all_vertices:
             self.states_utilities[str(vertex)] = StateUtility(
                 location=vertex,
                 unknown_edges=self.unknown_edges,
-                initial_value=np.inf
+                initial_value=-np.inf
             )
 
-    # TODO: Implement this method
-    def preform_value_iteration(self):
-        self._set_default_values()
-
-        start_location = self.initial_state.agents[self.initial_state.agent_idx]["location"]
-        goal_location = self.initial_state.picked_packages[0]["deliver_to"]
-
         # Set goal state utility
-        self.states_utilities[str(goal_location)].set_utility_value(
+        self.states_utilities[str(goal_location)].update_utility_value(
             unknowns_state=["X"] * len(self.unknown_edges),
             value=0.0,
             action="no-op"
         )
+
+    def _update_known_utilities(self):
+        possible_moves = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+        success_update = True
+
+        while success_update:
+            success_update = False
+
+            for vertex in self.states_utilities.keys():
+                state_utility = self.states_utilities[vertex]
+                curr_location = state_utility.location
+
+                for move in possible_moves:
+                    new_location = [curr_location[0] + move[0], curr_location[1] + move[1]]
+
+                    # Validate if the new location is a vertex on the graph
+                    try:
+                        self.state.coordinates_to_vertex_index(coords=new_location)
+                    except:
+                        continue
+
+                    if self.state.is_path_available(current_vertex=curr_location,
+                                                    next_vertex=new_location,
+                                                    mode="Coords"):
+                        edge_type, edge_cost = self.state.get_edge_type_and_cost(
+                            current_vertex=curr_location,
+                            next_vertex=new_location,
+                            mode="Coords"
+                        )
+                        if edge_type != "Normal":
+                            continue
+                        action = self.state.get_action_name(
+                            current_vertex=curr_location,
+                            next_vertex=new_location,
+                            mode="Coords"
+                        )
+                        next_location_value = self.states_utilities[str(new_location)].utility_value(
+                            unknowns_state=["U"] * len(self.unknown_edges)
+                        )
+                        new_value = (-edge_cost) + next_location_value
+                        update_result = state_utility.update_utility_value(
+                            unknowns_state=["X"] * len(self.unknown_edges),
+                            value=new_value,
+                            action=action
+                        )
+                        if update_result:
+                            success_update = True
+                    else:
+                        continue
+
+    # TODO: Implement this method
+    def preform_value_iteration(self):
+        start_location = self.state.picked_packages[0]["package_at"]
+        goal_location = self.state.picked_packages[0]["deliver_to"]
+
+        self._set_initial_values(goal_location=goal_location)
+        self._update_known_utilities()
 
         print("TBD")
 

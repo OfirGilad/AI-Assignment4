@@ -24,6 +24,20 @@ class State:
         self.archived_packages = environment_data.get("archived_packages", list())
         self.update_packages_info()
 
+        # Check Validations
+        self._validations()
+
+    def _validations(self):
+        all_packages = self.packages + self.placed_packages + self.picked_packages
+        if len(all_packages) != 1:
+            raise ValueError("Only one package should be available in the environment!")
+
+        if len(self.agents) != 1:
+            raise ValueError("Only one agent should be available in the environment!")
+
+        if all_packages[0]["package_at"] != self.agents[0]["location"]:
+            raise ValueError("The package should be placed at the agent location!")
+
     def coordinates_to_vertex_index(self, coords: list) -> int:
         row, col = coords
         if row < 0 or row >= self.X or col < 0 or col >= self.Y:
@@ -165,7 +179,7 @@ class State:
 
         return current_vertex_coords, next_vertex_coords
 
-    def is_path_available(self, current_vertex, next_vertex, mode):
+    def is_path_available(self, current_vertex, next_vertex, mode: str):
         current_vertex_index, next_vertex_index = self.convert_to_node_indices(
             current_vertex=current_vertex,
             next_vertex=next_vertex,
@@ -191,7 +205,7 @@ class State:
         # All validation passed
         return True
 
-    def edge_cost(self, current_vertex, next_vertex, mode="Coords"):
+    def edge_cost(self, current_vertex, next_vertex, mode: str):
         current_vertex_index, next_vertex_index = self.convert_to_node_indices(
             current_vertex=current_vertex,
             next_vertex=next_vertex,
@@ -200,19 +214,35 @@ class State:
 
         return self.adjacency_matrix[current_vertex_index, next_vertex_index]
 
-    def perform_agent_step(self, current_vertex, next_vertex, mode):
-        current_vertex, next_vertex = self.convert_to_node_coords(
+    def get_action_name(self, current_vertex, next_vertex, mode: str):
+        current_vertex_coords, next_vertex_coords = self.convert_to_node_coords(
             current_vertex=current_vertex,
             next_vertex=next_vertex,
             mode=mode
         )
-        if self.is_path_available(current_vertex=current_vertex, next_vertex=next_vertex, mode="Coords"):
+
+        if current_vertex_coords[0] > next_vertex_coords[0] and current_vertex_coords[1] == next_vertex_coords[1]:
+            return "Up"
+        elif current_vertex_coords[0] < next_vertex_coords[0] and current_vertex_coords[1] == next_vertex_coords[1]:
+            return "Down"
+        elif current_vertex_coords[0] == next_vertex_coords[0] and current_vertex_coords[1] > next_vertex_coords[1]:
+            return "Left"
+        else:
+            return "Right"
+
+    def perform_agent_step(self, current_vertex, next_vertex, mode: str):
+        current_vertex_coords, next_vertex_coords = self.convert_to_node_coords(
+            current_vertex=current_vertex,
+            next_vertex=next_vertex,
+            mode=mode
+        )
+        if self.is_path_available(current_vertex=current_vertex_coords, next_vertex=next_vertex_coords, mode="Coords"):
             # Break fragile edges
             for edge_idx, edge in enumerate(self.special_edges):
                 fragile_edge_step_validation = (
                     edge["type"] == "fragile" and (
-                        (edge["from"] == current_vertex and edge["to"] == next_vertex) or
-                        (edge["from"] == next_vertex and edge["to"] == current_vertex)
+                        (edge["from"] == current_vertex_coords and edge["to"] == next_vertex_coords) or
+                        (edge["from"] == next_vertex_coords and edge["to"] == current_vertex_coords)
                     )
                 )
                 if fragile_edge_step_validation:
@@ -221,35 +251,58 @@ class State:
 
             # Update agent data
             agent_data = self.agents[self.agent_idx]
-            agent_data["location"] = next_vertex
+            agent_data["location"] = next_vertex_coords
             agent_data["number_of_actions"] += 1
             self.agents[self.agent_idx] = agent_data
 
             # Return Action Name
-            if current_vertex[0] > next_vertex[0] and current_vertex[1] == next_vertex[1]:
-                return "Up"
-            elif current_vertex[0] < next_vertex[0] and current_vertex[1] == next_vertex[1]:
-                return "Down"
-            elif current_vertex[0] == next_vertex[0] and current_vertex[1] > next_vertex[1]:
-                return "Left"
-            else:
-                return "Right"
+            return self.get_action_name(
+                current_vertex=current_vertex_coords,
+                next_vertex=next_vertex_coords,
+                mode="Coords"
+            )
         else:
             raise ValueError("Invalid step was performed")
 
     def perform_agent_action(self, current_vertex, action: str, mode: str):
+        if mode == "Coords":
+            current_vertex_coords = current_vertex
+        elif mode == "Indices":
+            current_vertex_coords = self.vertex_index_to_coordinates(idx=current_vertex)
+        else:
+            raise ValueError(f"Invalid mode: {mode}")
+
         if action == "Up":
-            next_vertex = [current_vertex[0] - 1, current_vertex[1]]
+            next_vertex_coords = [current_vertex_coords[0] - 1, current_vertex_coords[1]]
         elif action == "Down":
-            next_vertex = [current_vertex[0] + 1, current_vertex[1]]
+            next_vertex_coords = [current_vertex_coords[0] + 1, current_vertex_coords[1]]
         elif action == "Left":
-            next_vertex = [current_vertex[0], current_vertex[1] - 1]
+            next_vertex_coords = [current_vertex_coords[0], current_vertex_coords[1] - 1]
         elif action == "Right":
-            next_vertex = [current_vertex[0], current_vertex[1] + 1]
+            next_vertex_coords = [current_vertex_coords[0], current_vertex_coords[1] + 1]
         else:
             raise ValueError(f"Invalid action: {action}")
 
-        self.perform_agent_step(current_vertex, next_vertex, mode=mode)
+        self.perform_agent_step(current_vertex_coords, next_vertex_coords, mode="Coords")
+
+    def get_edge_type_and_cost(self, current_vertex, next_vertex, mode: str):
+        current_vertex_coords, next_vertex_coords = self.convert_to_node_coords(
+            current_vertex=current_vertex,
+            next_vertex=next_vertex,
+            mode=mode
+        )
+
+        edge_type = "Normal"
+        for edge in self.special_edges:
+            if edge["from"] == current_vertex_coords and edge["to"] == next_vertex_coords:
+                edge_type = edge["type"]
+            elif edge["from"] == next_vertex_coords and edge["to"] == current_vertex_coords:
+                edge_type = edge["type"]
+            else:
+                continue
+
+        edge_cost = self.edge_cost(current_vertex=current_vertex_coords, next_vertex=next_vertex_coords, mode="Coords")
+        return edge_type, edge_cost
 
     def __str__(self):
         # Coordinates

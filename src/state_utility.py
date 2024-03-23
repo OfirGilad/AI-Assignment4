@@ -28,23 +28,42 @@ class StateUtility:
                 return False
         return True
 
-    def set_utility_value(self, unknowns_state: list, value: float, action=None):
+    def update_utility_value(self, unknowns_state: list, value: float, action=None):
+        success_update = False
         iter_product = itertools.product(self.edges_states, repeat=len(self.unknown_edges))
         for product in iter_product:
             product_lst = list(product)
             if self._compare_states_format(product_lst, unknowns_state):
                 product_str = str(product_lst)
                 curr_value = self.utilities[product_str]["value"]
-                if curr_value < value:
+                if curr_value >= value:
                     print(
                         f"Failed to update location '{self.location}' utility state '{product_str}': "
                         f"new value: {value}, current value: {curr_value}."
                     )
-                    continue
-                self.utilities[product_str]["value"] = value
-                self.utilities[product_str]["optimal_action"] = action
+                else:
+                    self.utilities[product_str]["value"] = value
+                    self.utilities[product_str]["optimal_action"] = action
+                    success_update = True
             else:
                 continue
+
+        return success_update
+
+    def utility_value(self, unknowns_state: list):
+        value = None
+        iter_product = itertools.product(self.edges_states, repeat=len(self.unknown_edges))
+        for product in iter_product:
+            product_lst = list(product)
+            if self._compare_states_format(product_lst, unknowns_state):
+                product_str = str(product_lst)
+                value = self.utilities[product_str]["value"]
+                break
+
+        if value is not None:
+            return value
+        else:
+            raise ValueError(f"Unknown state '{unknowns_state}' for location '{self.location}'")
 
 
 if __name__ == '__main__':
