@@ -5,13 +5,13 @@ class StateUtility:
     def __init__(self, location: list, unknown_edges: list, initial_value=None):
         self.location = location
         self.unknown_edges = unknown_edges
-        self.edges_states = ["T", "F", "U"]
+        self.edge_states = ["T", "F", "U"]
         self.utilities = dict()
 
         self._set_initial_values(initial_value=initial_value)
 
     def _set_initial_values(self, initial_value):
-        iter_product = itertools.product(self.edges_states, repeat=len(self.unknown_edges))
+        iter_product = itertools.product(self.edge_states, repeat=len(self.unknown_edges))
         for product in iter_product:
             product_str = str(list(product))
             self.utilities[product_str] = {
@@ -28,19 +28,20 @@ class StateUtility:
                 return False
         return True
 
-    def update_utility_value(self, unknowns_state: list, value: float, action=None):
+    def update_utility_value(self, unknown_state: list, value: float, action=None):
         success_update = False
-        iter_product = itertools.product(self.edges_states, repeat=len(self.unknown_edges))
+        iter_product = itertools.product(self.edge_states, repeat=len(self.unknown_edges))
         for product in iter_product:
             product_lst = list(product)
-            if self._compare_states_format(product_lst, unknowns_state):
+            if self._compare_states_format(product_lst, unknown_state):
                 product_str = str(product_lst)
                 curr_value = self.utilities[product_str]["value"]
                 if curr_value >= value:
-                    print(
-                        f"Failed to update location '{self.location}' utility state '{product_str}': "
-                        f"new value: {value}, current value: {curr_value}."
-                    )
+                    # print(
+                    #     f"Failed to update location '{self.location}' utility state '{product_str}': "
+                    #     f"new value: {value}, current value: {curr_value}."
+                    # )
+                    continue
                 else:
                     self.utilities[product_str]["value"] = value
                     self.utilities[product_str]["optimal_action"] = action
@@ -50,12 +51,12 @@ class StateUtility:
 
         return success_update
 
-    def utility_value(self, unknowns_state: list):
+    def utility_value(self, unknown_state: list):
         value = None
-        iter_product = itertools.product(self.edges_states, repeat=len(self.unknown_edges))
+        iter_product = itertools.product(self.edge_states, repeat=len(self.unknown_edges))
         for product in iter_product:
             product_lst = list(product)
-            if self._compare_states_format(product_lst, unknowns_state):
+            if self._compare_states_format(product_lst, unknown_state):
                 product_str = str(product_lst)
                 value = self.utilities[product_str]["value"]
                 break
@@ -63,7 +64,24 @@ class StateUtility:
         if value is not None:
             return value
         else:
-            raise ValueError(f"Unknown state '{unknowns_state}' for location '{self.location}'")
+            raise ValueError(f"Unknown state '{unknown_state}' for location '{self.location}'")
+
+    def utility_value_and_action(self, unknown_state: list):
+        value = None
+        action = None
+        iter_product = itertools.product(self.edge_states, repeat=len(self.unknown_edges))
+        for product in iter_product:
+            product_lst = list(product)
+            if self._compare_states_format(product_lst, unknown_state):
+                product_str = str(product_lst)
+                value = self.utilities[product_str]["value"]
+                action = self.utilities[product_str]["optimal_action"]
+                break
+
+        if value is not None:
+            return value, action
+        else:
+            raise ValueError(f"Unknown state '{unknown_state}' for location '{self.location}'")
 
 
 if __name__ == '__main__':
