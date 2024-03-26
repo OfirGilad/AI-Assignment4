@@ -119,8 +119,9 @@ class UtilityOfStates:
             self._update_utilities_under_known_states(known_state=known_state)
 
         # Get all possible unknown states
-        unknown_states = itertools.product(["F", "T", "U"], repeat=len(self.unknown_edges)+1)
+        unknown_states = itertools.product(["F", "T", "U"], repeat=len(self.unknown_edges))
         unknown_states = list(list(unknown_state) for unknown_state in unknown_states if "U" in unknown_state)
+        unknown_states.sort(key=lambda x: x.count("U"))
 
         print("TBD")
 
