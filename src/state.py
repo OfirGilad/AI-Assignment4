@@ -28,15 +28,17 @@ class State:
         self._validations()
 
     def _validations(self):
-        all_packages = self.packages + self.placed_packages + self.picked_packages
+        all_packages = self.packages + self.placed_packages + self.picked_packages + self.archived_packages
+
         if len(all_packages) != 1:
             raise ValueError("Only one package should be available in the environment!")
 
         if len(self.agents) != 1:
             raise ValueError("Only one agent should be available in the environment!")
 
-        if all_packages[0]["package_at"] != self.agents[0]["location"]:
-            raise ValueError("The package should be placed at the agent location!")
+        if all_packages[0]["holder_agent_id"] == -1:
+            if all_packages[0]["package_at"] != self.agents[0]["location"]:
+                raise ValueError("The package should be placed at the agent location!")
 
     def coordinates_to_vertex_index(self, coords: list) -> int:
         row, col = coords

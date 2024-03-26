@@ -7,7 +7,8 @@ class Simulator:
     def __init__(self, initial_state: State, utility_of_states: UtilityOfStates):
         self.current_state = initial_state
         self.utility_of_states = utility_of_states
-        self.states = [self.current_state]
+        self.unknown_state = self.utility_of_states.get_initial_unknown_state()
+        # self.states = [self.current_state]
 
     def _goal_achieved(self):
         goal_validation = (
@@ -34,9 +35,13 @@ class Simulator:
         while True:
             # Perform Agent Action
             self.current_state = self.current_state.clone_state()
-            current_agent = Agent(state=self.current_state, utility_of_states=self.utility_of_states)
+            current_agent = Agent(
+                state=self.current_state,
+                utility_of_states=self.utility_of_states,
+                unknown_state=self.unknown_state
+            )
             self.current_state, action = current_agent.perform_action()
-            self.states.append(self.current_state)
+            # self.states.append(self.current_state)
 
             # Print Agent Action
             agent_type = self.current_state.agents[agent_idx]['type']

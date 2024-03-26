@@ -51,21 +51,6 @@ class StateUtility:
 
         return success_update
 
-    def utility_value(self, unknown_state: list):
-        value = None
-        iter_product = itertools.product(self.edge_states, repeat=len(self.unknown_edges))
-        for product in iter_product:
-            product_lst = list(product)
-            if self._compare_states_format(product_lst, unknown_state):
-                product_str = str(product_lst)
-                value = self.utilities[product_str]["value"]
-                break
-
-        if value is not None:
-            return value
-        else:
-            raise ValueError(f"Unknown state '{unknown_state}' for location '{self.location}'")
-
     def utility_value_and_action(self, unknown_state: list):
         value = None
         action = None
