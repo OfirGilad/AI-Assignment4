@@ -32,7 +32,18 @@ class UtilityOfStates:
             action="no-op"
         )
 
-    def _update_known_utilities(self):
+    def _check_edge_state(self, fragile_edge, known_state):
+        for idx, unknown_edge in enumerate(self.unknown_edges):
+            if unknown_edge["from"] == fragile_edge["from"] and unknown_edge["to"] == fragile_edge["to"]:
+                return known_state[idx]
+            elif unknown_edge["from"] == fragile_edge["to"] and unknown_edge["to"] == fragile_edge["from"]:
+                return known_state[idx]
+            else:
+                continue
+
+        raise Exception("Edge not found in unknown edges (fragile edges)")
+
+    def _update_utilities_under_known_states(self, known_state):
         possible_moves = [[1, 0], [-1, 0], [0, 1], [0, -1]]
         success_update = True
 
@@ -60,19 +71,25 @@ class UtilityOfStates:
                             next_vertex=new_location,
                             mode="Coords"
                         )
-                        if edge_type != "Normal":
-                            continue
+                        if edge_type == "fragile":
+                            fragile_edge = {"from": curr_location, "to": new_location}
+                            state_value = self._check_edge_state(fragile_edge=fragile_edge, known_state=known_state)
+
+                            # If the edge is blocked, continue to the next move
+                            if state_value == "T":
+                                continue
+
                         action = self.state.get_action_name(
                             current_vertex=curr_location,
                             next_vertex=new_location,
                             mode="Coords"
                         )
                         next_location_value = self.states_utilities[str(new_location)].utility_value(
-                            unknowns_state=["U"] * len(self.unknown_edges)
+                            unknowns_state=known_state
                         )
                         new_value = (-edge_cost) + next_location_value
                         update_result = state_utility.update_utility_value(
-                            unknowns_state=["X"] * len(self.unknown_edges),
+                            unknowns_state=known_state,
                             value=new_value,
                             action=action
                         )
@@ -81,13 +98,19 @@ class UtilityOfStates:
                     else:
                         continue
 
+    def _update_utilities_under_unknown_states(self):
+        pass
+
     # TODO: Implement this method
     def preform_value_iteration(self):
         start_location = self.state.picked_packages[0]["package_at"]
         goal_location = self.state.picked_packages[0]["deliver_to"]
 
         self._set_initial_values(goal_location=goal_location)
-        self._update_known_utilities()
+        known_states = itertools.product(["F", "T"], repeat=len(self.unknown_edges))
+        known_states = list(list(known_state) for known_state in known_states)
+        for known_state in known_states:
+            self._update_utilities_under_known_states(known_state=known_state)
 
         print("TBD")
 

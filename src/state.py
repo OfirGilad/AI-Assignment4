@@ -292,7 +292,7 @@ class State:
             mode=mode
         )
 
-        edge_type = "Normal"
+        edge_type = "normal"
         for edge in self.special_edges:
             if edge["from"] == current_vertex_coords and edge["to"] == next_vertex_coords:
                 edge_type = edge["type"]
