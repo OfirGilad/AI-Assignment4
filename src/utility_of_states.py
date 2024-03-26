@@ -3,6 +3,7 @@ from state_utility import StateUtility
 
 import itertools
 import numpy as np
+from copy import deepcopy
 
 
 class UtilityOfStates:
@@ -106,11 +107,20 @@ class UtilityOfStates:
         start_location = self.state.picked_packages[0]["package_at"]
         goal_location = self.state.picked_packages[0]["deliver_to"]
 
+        # Set initial values
         self._set_initial_values(goal_location=goal_location)
+
+        # Get all possible known states
         known_states = itertools.product(["F", "T"], repeat=len(self.unknown_edges))
         known_states = list(list(known_state) for known_state in known_states)
+
+        # Update utilities under known states
         for known_state in known_states:
             self._update_utilities_under_known_states(known_state=known_state)
+
+        # Get all possible unknown states
+        unknown_states = itertools.product(["F", "T", "U"], repeat=len(self.unknown_edges)+1)
+        unknown_states = list(list(unknown_state) for unknown_state in unknown_states if "U" in unknown_state)
 
         print("TBD")
 
