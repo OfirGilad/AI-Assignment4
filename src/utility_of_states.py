@@ -44,6 +44,47 @@ class UtilityOfStates:
 
         raise Exception("Edge not found in unknown edges (fragile edges)")
 
+    def _find_alternative_new_locations(self, curr_location, current_move, unknown_state):
+        possible_moves = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+        alternative_new_locations = list()
+
+        for alternative_move in possible_moves:
+            if alternative_move == current_move:
+                continue
+
+            new_location = [curr_location[0] + alternative_move[0], curr_location[1] + alternative_move[1]]
+
+            # Validate if the new location is a vertex on the graph
+            try:
+                self.state.coordinates_to_vertex_index(coords=new_location)
+            except:
+                continue
+
+            if self.state.is_path_available(current_vertex=curr_location,
+                                            next_vertex=new_location,
+                                            mode="Coords"):
+                edge_type, edge_cost = self.state.get_edge_type_and_cost(
+                    current_vertex=curr_location,
+                    next_vertex=new_location,
+                    mode="Coords"
+                )
+                edge_state = "F"
+                if edge_type == "fragile":
+                    fragile_edge = {"from": curr_location, "to": new_location}
+                    edge_state, _ = self._check_edge_state(
+                        fragile_edge=fragile_edge,
+                        unknown_state=unknown_state
+                    )
+
+                if edge_state == "T":
+                    continue
+                elif edge_state == "F":
+                    alternative_new_locations.append(new_location)
+                elif edge_state == "U":
+                    continue
+
+        return alternative_new_locations
+
     def _update_utilities_under_unknown_state(self, unknown_state):
         possible_moves = [[1, 0], [-1, 0], [0, 1], [0, -1]]
         success_update = True
@@ -94,20 +135,35 @@ class UtilityOfStates:
 
                         # If the edge state is unknown, calculate the new value based on the probabilities
                         elif edge_state == "U":
-                            p = self.unknown_edges[edge_idx]["p"]
-
-                            # TODO: Find how to calculate the probabilities correctly (by taking min cost option)
-
-                            # TODO: Edge is blocked (need to look for alternative paths)
+                            ###################
+                            # Edge is blocked #
+                            ###################
                             unknown_state_t = deepcopy(unknown_state)
                             unknown_state_t[edge_idx] = "T"
-                            next_location_value_t, _ = (
-                                self.states_utilities[str(new_location)].utility_value_and_action(
-                                    unknown_state=unknown_state_t
-                                )
+                            alternative_new_locations = self._find_alternative_new_locations(
+                                curr_location=curr_location,
+                                current_move=possible_move,
+                                unknown_state=unknown_state_t
                             )
 
-                            # Edge is passable
+                            # If there are no alternative new locations, continue to the next move
+                            if len(alternative_new_locations) == 0:
+                                continue
+                            # If there are alternative new locations, calculate the new value based on the maximum value
+                            else:
+                                min_path_cost = -np.inf
+                                for alternative_new_location in alternative_new_locations:
+                                    alternative_location_value, _ = (
+                                        self.states_utilities[str(alternative_new_location)].utility_value_and_action(
+                                            unknown_state=unknown_state_t
+                                        )
+                                    )
+                                    min_path_cost = max(min_path_cost, alternative_location_value)
+                                next_location_value_t = min_path_cost
+
+                            #####################
+                            # Edge is unblocked #
+                            #####################
                             unknown_state_f = deepcopy(unknown_state)
                             unknown_state_f[edge_idx] = "F"
                             next_location_value_f, _ = (
@@ -116,6 +172,7 @@ class UtilityOfStates:
                                 )
                             )
 
+                            p = self.unknown_edges[edge_idx]["p"]
                             next_location_value = p * next_location_value_t + (1 - p) * next_location_value_f
                         else:
                             raise Exception("Unknown edge state")

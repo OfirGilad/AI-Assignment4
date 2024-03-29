@@ -55,3 +55,6 @@ class Simulator:
             # Check if goal achieved
             if self._goal_achieved():
                 return
+
+            if action == "no-op":
+                print("Agent performed 'no-op' action. Goal state is not reachable.")
