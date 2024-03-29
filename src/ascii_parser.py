@@ -40,7 +40,9 @@ class Parser:
         edge = {
             "type": "always blocked",
             "from": [int(line_data_args[1]), int(line_data_args[2])],
-            "to": [int(line_data_args[3]), int(line_data_args[4])]
+            "to": [int(line_data_args[3]), int(line_data_args[4])],
+            "identifier": f"({int(line_data_args[1])},{int(line_data_args[2])}) "
+                          f"({int(line_data_args[3])},{int(line_data_args[4])})"
         }
         self.parsed_data["special_edges"].append(edge)
 
@@ -49,7 +51,9 @@ class Parser:
             "type": "fragile",
             "from": [int(line_data_args[1]), int(line_data_args[2])],
             "to": [int(line_data_args[3]), int(line_data_args[4])],
-            "p": float(line_data_args[5])
+            "p": float(line_data_args[5]),
+            "identifier": f"({int(line_data_args[1])},{int(line_data_args[2])}) "
+                          f"({int(line_data_args[3])},{int(line_data_args[4])})"
         }
         self.parsed_data["special_edges"].append(edge)
 

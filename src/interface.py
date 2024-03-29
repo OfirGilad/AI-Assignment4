@@ -22,6 +22,7 @@ class Interface:
         print(results)
 
     def _generate_new_graph_instance(self):
+        graph_instance_str = "Generating new graph instance...\n"
         self.graph_instance = self.initial_state.clone_state()
 
         # Replace fragile edges with always blocked edges or normal edges (based on probabilities)
@@ -34,15 +35,17 @@ class Interface:
                 choice = choices(population=population, weights=weights)
 
                 if choice[0]:
+                    graph_instance_str += f"Fragile edge: '{special_edge['identifier']}' was set as 'blocked'.\n"
                     special_edge["type"] = "always blocked"
                     updated_special_edges.append(special_edge)
                 else:
-                    continue
+                    graph_instance_str += f"Fragile edge: '{special_edge['identifier']}' was set as: 'unblocked'.\n"
             else:
                 updated_special_edges.append(special_edge)
 
         self.graph_instance.special_edges = updated_special_edges
-        print("Graph instance generated!")
+        graph_instance_str += "Graph instance generated!\n"
+        print(graph_instance_str)
 
     def _run_simulator(self):
         if self.graph_instance is None:

@@ -232,6 +232,7 @@ class UtilityOfStates:
         Y = self.state.Y
         all_vertices = list(list(vertex) for vertex in itertools.product(range(X), range(Y)))
         for vertex in all_vertices:
+            belief_states_str += "\n"
             belief_states_str += f"Vertex {tuple(vertex)}:\n"
             for unknown_state in unknown_states:
                 value, action = self.states_utilities[str(vertex)].utility_value_and_action(
@@ -239,7 +240,6 @@ class UtilityOfStates:
                 )
                 action = "unreachable" if action is None else action
                 belief_states_str += f"U{str(unknown_state)}={value}, Optimal Action: {action}\n"
-            belief_states_str += "\n"
 
         return belief_states_str
 

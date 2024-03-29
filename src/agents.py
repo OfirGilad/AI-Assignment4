@@ -17,11 +17,15 @@ class Agent:
             state=self.state,
             unknown_state=self.unknown_state
         )
-
-        self.state.perform_agent_action(
-            current_vertex=agent_data["location"],
-            action=action,
-            mode="Coords"
-        )
-        self.state.update_agent_packages_status()
+        # Goal reachable
+        if action is not None:
+            self.state.perform_agent_action(
+                current_vertex=agent_data["location"],
+                action=action,
+                mode="Coords"
+            )
+            self.state.update_agent_packages_status()
+        # Goal unreachable
+        else:
+            action = "no-op"
         return self.state, action

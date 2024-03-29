@@ -33,6 +33,9 @@ class State:
         if len(all_packages) != 1:
             raise ValueError("Only one package should be available in the environment!")
 
+        if all_packages[0]["from_time"] != 0:
+            raise ValueError("The package should appear at time 0!")
+
         if len(self.agents) != 1:
             raise ValueError("Only one agent should be available in the environment!")
 
@@ -362,7 +365,7 @@ class State:
                 raise ValueError("Invalid agent type")
 
         print_data += "\n"
-        print_data += f"#T {self.time} ; Total Time unit passed: {self.time}"
+        print_data += f"#T {self.time} ; Total Time unit passed: {self.time}\n"
        
         return print_data
 
