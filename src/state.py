@@ -355,7 +355,7 @@ class State:
                 a_score = agent["score"]
                 a_actions = agent["number_of_actions"]
                 print_data += (
-                    f"#A  L ({a_location[0]},{a_location[1]})  A {a_actions}  S {a_score} ; "
+                    f"#A 0  L {a_location[0]} {a_location[1]}  A {a_actions}  S {a_score} ; "
                     f"Agent {agent_idx}: Normal agent, "
                     f"Location: ({a_location[0]} {a_location[1]}), "
                     f"Number of actions: {a_actions}, "
