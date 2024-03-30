@@ -304,7 +304,7 @@ class UtilityOfStates:
 
                     from_coords = f"({current_location[0]},{current_location[1]})"
                     to_coords = f"({next_location[0]},{next_location[1]})"
-                    policy_str += f"{bulk_format} Action: '{action}' (From {from_coords} to {to_coords})\n"
+                    policy_str += f"{bulk_format} Action: '{action}' (From '{from_coords}' to '{to_coords}')\n"
 
                     policy_str = self._find_policy_recursive(
                         current_location=next_location,
@@ -325,7 +325,7 @@ class UtilityOfStates:
                     for idx, edge_idx in enumerate(closest_not_scanned_edges_indices):
                         edge = self.unknown_edges[edge_idx]
                         edge_identifier = edge["identifier"]
-                        policy_str += f"{separator}Blocked[{edge_identifier}]={combination[idx]}"
+                        policy_str += f"{separator}Blocked['{edge_identifier}']={combination[idx]}"
                         separator = " and "
                         combination_unknown_state[edge_idx] = combination[idx]
                     policy_str += "):\n"
