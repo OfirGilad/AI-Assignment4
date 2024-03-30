@@ -58,15 +58,15 @@ The available options are: `0`, `1`, `2`, `3`, `4`, where:
 2. Option `1`: Prints the constructed policy in the following format:
    ```
    The constructed policy:
-   - Action: 'Right' (From '(0,0)' to '(0,1)')
-   - If (Blocked['(0,1) (0,2)']=F):
-   -- Action: 'Down' (From '(0,1)' to '(1,1)')
-   -- etc.
-   -- Action: 'no-op', Path cost: -7 (Goal reached)
-   - If (Blocked['(0,1) (0,2)']=T):
-   -- Action: 'Down' (From '(0,1)' to '(1,1)')
-   -- etc.
-   -- Action: 'no-op', Path cost: -7 (Goal reached)
+   -> Action: 'Right' (From '(0,0)' to '(0,1)')
+   -> If (Blocked['(0,1) (0,2)']=F):
+   ->-> Action: 'Down' (From '(0,1)' to '(1,1)')
+   ->-> etc.
+   ->-> Action: 'no-op', Path cost: -7 (Goal reached)
+   -> If (Blocked['(0,1) (0,2)']=T):
+   ->-> Action: 'Down' (From '(0,1)' to '(1,1)')
+   ->-> etc.
+   ->-> Action: 'no-op', Path cost: -7 (Goal reached)
    Policy Expected Utility: -7.0
    ```
 3. Option `2`: Generates a new graph instance and prints the given state to each fragile edge in the following format:
