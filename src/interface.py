@@ -40,7 +40,7 @@ class Interface:
                 choice = choices(population=population, weights=weights)
 
                 if choice[0]:
-                    graph_instance_str += f"Fragile edge: '{special_edge['identifier']}' was set as 'blocked'.\n"
+                    graph_instance_str += f"Fragile edge: '{special_edge['identifier']}' was set as: 'blocked'.\n"
                     special_edge["type"] = "always blocked"
                     updated_special_edges.append(special_edge)
                 else:
@@ -51,6 +51,8 @@ class Interface:
         self.graph_instance.special_edges = updated_special_edges
         graph_instance_str += "Graph instance generated!\n"
         print(graph_instance_str)
+        print(f"Graph Instance State:")
+        print(self.graph_instance)
 
     def _run_simulator(self):
         if self.graph_instance is None:

@@ -98,3 +98,10 @@ The available options are: `0`, `1`, `2`, `3`, `4`, where:
    #T 7.0 ; Total Time unit passed: 7.0
    ```
 5. Option `4`: Quits the program.
+
+## Non-trivial example runs on at least 2 scenarios, including the input and output:
+
+See the file [input_results.txt](input_results.txt) for the example runs of the 2 scenarios 
+in the following input files:
+- [input1.txt](input%2Finput1.txt)
+- [input2.txt](input%2Finput2.txt)

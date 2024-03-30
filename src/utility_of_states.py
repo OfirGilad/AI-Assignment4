@@ -247,7 +247,7 @@ class UtilityOfStates:
                     unknown_state=unknown_state
                 )
                 action = "unreachable" if action is None else action
-                belief_states_str += f"U{str(unknown_state)}={value}, Optimal Action: {action}\n"
+                belief_states_str += f"  U{str(unknown_state)}={value}, Optimal Action: {action}\n"
 
         return belief_states_str
 
@@ -342,7 +342,7 @@ class UtilityOfStates:
         return policy_str
 
     def find_policy(self):
-        policy_str = "The constructed policy:\n"
+        policy_str = "The Constructed Policy:\n\n"
 
         start_location = self.all_packages[0]["package_at"]
         goal_location = self.all_packages[0]["deliver_to"]
