@@ -12,13 +12,18 @@ class Interface:
         self.graph_instance = None
         self.user_actions = {
             "0": self._print_belief_states_values,
-            "1": self._generate_new_graph_instance,
-            "2": self._run_simulator,
-            "3": self._quit
+            "1": self._print_constructed_policy,
+            "2": self._generate_new_graph_instance,
+            "3": self._run_simulator,
+            "4": self._quit
         }
 
     def _print_belief_states_values(self):
         results = self.utility_of_states.belief_states_values()
+        print(results)
+
+    def _print_constructed_policy(self):
+        results = self.utility_of_states.find_policy()
         print(results)
 
     def _generate_new_graph_instance(self):
@@ -62,9 +67,10 @@ class Interface:
         user_information = (
             "Choose operation from the following options:\n"
             "0. Print the value of each belief-state, and the optimal action in that belief state, if it exists.\n"
-            "1. Generate new graph instance.\n"
-            "2. Run simulator (Prerequisite: a graph instance must exists).\n"
-            "3. Quit.\n"
+            "1. Print the constructed policy.\n"
+            "2. Generate new graph instance.\n"
+            "3. Run simulator (Prerequisite: a graph instance must exists).\n"
+            "4. Quit.\n"
             "Your choice: "
         )
 
@@ -74,4 +80,4 @@ class Interface:
             if user_action is not None:
                 user_action()
             else:
-                print(f"Invalid input: {user_input}! Write either '0','1','2' or '3'. \n")
+                print(f"Invalid input: {user_input}! Write either '0','1','2', '3' or '4'. \n")

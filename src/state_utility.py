@@ -1,17 +1,19 @@
 import itertools
+from typing import Callable
 
 
 class StateUtility:
-    def __init__(self, location: list, unknown_edges: list, initial_value=None):
+    def __init__(self, location: list, unknown_edges_func: Callable, initial_value=None):
         self.location = location
-        self.unknown_edges = unknown_edges
+        self.unknown_edges_func = unknown_edges_func
         self.edge_states = ["T", "F", "U"]
         self.utilities = dict()
 
         self._set_initial_values(initial_value=initial_value)
 
     def _set_initial_values(self, initial_value):
-        iter_product = itertools.product(self.edge_states, repeat=len(self.unknown_edges))
+        unknown_edges = self.unknown_edges_func()
+        iter_product = itertools.product(self.edge_states, repeat=len(unknown_edges))
         for product in iter_product:
             product_str = str(list(product))
             self.utilities[product_str] = {
@@ -30,7 +32,8 @@ class StateUtility:
 
     def update_utility_value(self, unknown_state: list, value: float, action=None):
         success_update = False
-        iter_product = itertools.product(self.edge_states, repeat=len(self.unknown_edges))
+        unknown_edges = self.unknown_edges_func()
+        iter_product = itertools.product(self.edge_states, repeat=len(unknown_edges))
         for product in iter_product:
             product_lst = list(product)
             if self._compare_states_format(product_lst, unknown_state):
@@ -54,7 +57,8 @@ class StateUtility:
     def utility_value_and_action(self, unknown_state: list):
         value = None
         action = None
-        iter_product = itertools.product(self.edge_states, repeat=len(self.unknown_edges))
+        unknown_edges = self.unknown_edges_func()
+        iter_product = itertools.product(self.edge_states, repeat=len(unknown_edges))
         for product in iter_product:
             product_lst = list(product)
             if self._compare_states_format(product_lst, unknown_state):

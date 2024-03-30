@@ -28,7 +28,10 @@ class Simulator:
             print(self.current_state)
             return True
         elif goal2_validation:
-            print("Goal achieved: There is no path for any agent to pick up or deliver any more packages on time")
+            print(
+                "Goal achieved: The agent performed no-op action \n"
+                "(According to the policy the goal might be unreachable and it is better to stop the simulation)."
+            )
             print(f"Final State:")
             print(self.current_state)
             return True

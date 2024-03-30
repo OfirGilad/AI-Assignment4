@@ -288,7 +288,11 @@ class State:
         else:
             raise ValueError(f"Invalid action: {action}")
 
-        self.perform_agent_step(current_vertex_coords, next_vertex_coords, mode="Coords")
+        self.perform_agent_step(
+            current_vertex=current_vertex_coords,
+            next_vertex=next_vertex_coords,
+            mode="Coords"
+        )
 
     def get_edge_type_and_cost(self, current_vertex, next_vertex, mode: str):
         current_vertex_coords, next_vertex_coords = self.convert_to_node_coords(
@@ -308,6 +312,20 @@ class State:
 
         edge_cost = self.edge_cost(current_vertex=current_vertex_coords, next_vertex=next_vertex_coords, mode="Coords")
         return edge_type, edge_cost
+
+    @staticmethod
+    def convert_action_to_movement(action: str):
+        if action == "Up":
+            next_vertex_coords = [-1, 0]
+        elif action == "Down":
+            next_vertex_coords = [1, 0]
+        elif action == "Left":
+            next_vertex_coords = [0, - 1]
+        elif action == "Right":
+            next_vertex_coords = [0, 1]
+        else:
+            raise ValueError(f"Invalid action: {action}")
+        return next_vertex_coords
 
     def __str__(self):
         # Coordinates

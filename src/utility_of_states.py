@@ -12,17 +12,18 @@ class UtilityOfStates:
         self.state = initial_state.clone_state()
         self.state.agents[0]["location"] = None
 
-        self.unknown_edges = list(edge for edge in self.state.special_edges if edge["type"] == "fragile")
+        self.unknown_edges = [edge for edge in self.state.special_edges if edge["type"] == "fragile"]
+        self.unknown_edges_func = lambda: self.unknown_edges
         self.states_utilities = dict()
 
     def _set_initial_values(self, goal_location):
         X = self.state.X
         Y = self.state.Y
-        all_vertices = list(list(vertex) for vertex in itertools.product(range(X), range(Y)))
+        all_vertices = [list(vertex) for vertex in itertools.product(range(X), range(Y))]
         for vertex in all_vertices:
             self.states_utilities[str(vertex)] = StateUtility(
                 location=vertex,
-                unknown_edges=self.unknown_edges,
+                unknown_edges_func=self.unknown_edges_func,
                 initial_value=-np.inf
             )
 
@@ -193,7 +194,6 @@ class UtilityOfStates:
                     else:
                         continue
 
-    # TODO: Implement this method
     def preform_value_iteration(self):
         # start_location = self.state.picked_packages[0]["package_at"]
         goal_location = self.state.picked_packages[0]["deliver_to"]
@@ -203,7 +203,7 @@ class UtilityOfStates:
 
         # Get all possible known states
         known_states = itertools.product(["F", "T"], repeat=len(self.unknown_edges))
-        known_states = list(list(known_state) for known_state in known_states)
+        known_states = [list(known_state) for known_state in known_states]
 
         # Update utilities under known states
         for known_state in known_states:
@@ -211,7 +211,7 @@ class UtilityOfStates:
 
         # Get all possible unknown states
         unknown_states = itertools.product(["F", "T", "U"], repeat=len(self.unknown_edges))
-        unknown_states = list(list(unknown_state) for unknown_state in unknown_states if "U" in unknown_state)
+        unknown_states = [list(unknown_state) for unknown_state in unknown_states if "U" in unknown_state]
         unknown_states.sort(key=lambda x: x.count("U"))
 
         # Update utilities under unknown states
@@ -223,14 +223,16 @@ class UtilityOfStates:
 
         # Get all belief states
         unknown_states = itertools.product(["F", "T", "U"], repeat=len(self.unknown_edges))
-        unknown_states = list(list(unknown_state) for unknown_state in unknown_states)
-        # unknown_states = list(list(unknown_state) for unknown_state in unknown_states if "U" in unknown_state)
+        unknown_states = [list(unknown_state) for unknown_state in unknown_states]
+
+        # # Filter belief states with unknown edges
+        # unknown_states = [list(unknown_state) for unknown_state in unknown_states if "U" in unknown_state]
         # unknown_states.sort(key=lambda x: x.count("U"))
 
         # Loop over all vertices
         X = self.state.X
         Y = self.state.Y
-        all_vertices = list(list(vertex) for vertex in itertools.product(range(X), range(Y)))
+        all_vertices = [list(vertex) for vertex in itertools.product(range(X), range(Y))]
         for vertex in all_vertices:
             belief_states_str += "\n"
             belief_states_str += f"Vertex {tuple(vertex)}:\n"
@@ -246,6 +248,116 @@ class UtilityOfStates:
     def get_initial_unknown_state(self):
         unknown_state = ["U"] * len(self.unknown_edges)
         return unknown_state
+
+    def _scan_closest_fragile_edges(self, current_location: list, unknown_state: list):
+        closest_not_scanned_edges_indices = list()
+
+        # No unknown edges
+        if unknown_state.count("U") == 0:
+            return closest_not_scanned_edges_indices, unknown_state
+
+        for edge_idx, edge in enumerate(self.unknown_edges):
+            if unknown_state[edge_idx] != "U":
+                continue
+
+            if edge["from"] == current_location:
+                closest_not_scanned_edges_indices.append(edge_idx)
+                unknown_state[edge_idx] = "X"
+            elif edge["to"] == current_location:
+                closest_not_scanned_edges_indices.append(edge_idx)
+                unknown_state[edge_idx] = "X"
+            else:
+                continue
+        return closest_not_scanned_edges_indices, unknown_state
+
+    def _find_policy_recursive(self,
+                               current_location: list,
+                               goal_location: list,
+                               unknown_state: list,
+                               bulk_format: str,
+                               path_cost: int,
+                               policy_str: str):
+        if current_location == goal_location:
+            policy_str += f"{bulk_format} Action: 'no-op', Path cost: {path_cost} (Goal reached)\n"
+        else:
+            closest_not_scanned_edges_indices, unknown_state = self._scan_closest_fragile_edges(
+                current_location=current_location,
+                unknown_state=unknown_state
+            )
+            if len(closest_not_scanned_edges_indices) == 0:
+                state_utility = self.states_utilities[str(current_location)]
+                expected_value, action = state_utility.utility_value_and_action(unknown_state=unknown_state)
+                if action is None:
+                    policy_str += (
+                        f"{bulk_format} Action: 'no-op', Path cost: -inf "
+                        f"(Goal might be unreachable and it's best to stop)\n"
+                    )
+                else:
+                    move = self.state.convert_action_to_movement(action=action)
+                    next_location = [current_location[0] + move[0], current_location[1] + move[1]]
+
+                    from_coords = f"({current_location[0]},{current_location[1]})"
+                    to_coords = f"({next_location[0]},{next_location[1]})"
+                    policy_str += f"{bulk_format} Action: '{action}' (From {from_coords} to {to_coords})\n"
+
+                    policy_str = self._find_policy_recursive(
+                        current_location=next_location,
+                        goal_location=goal_location,
+                        unknown_state=unknown_state,
+                        bulk_format=bulk_format,
+                        path_cost=path_cost-1,
+                        policy_str=policy_str
+                    )
+            else:
+                edges_states_combinations = itertools.product(["F", "T"], repeat=len(closest_not_scanned_edges_indices))
+                edges_states_combinations = [list(combination) for combination in edges_states_combinations]
+
+                for combination in edges_states_combinations:
+                    policy_str += f"{bulk_format} If ("
+                    combination_unknown_state = deepcopy(unknown_state)
+                    separator = ""
+                    for idx, edge_idx in enumerate(closest_not_scanned_edges_indices):
+                        edge = self.unknown_edges[edge_idx]
+                        edge_identifier = edge["identifier"]
+                        policy_str += f"{separator}Blocked[{edge_identifier}]={combination[idx]}"
+                        separator = " and "
+                        combination_unknown_state[edge_idx] = combination[idx]
+                    policy_str += "):\n"
+
+                    policy_str = self._find_policy_recursive(
+                        current_location=current_location,
+                        goal_location=goal_location,
+                        unknown_state=combination_unknown_state,
+                        bulk_format=f"{bulk_format}-",
+                        path_cost=path_cost,
+                        policy_str=policy_str
+                    )
+
+        return policy_str
+
+    def find_policy(self):
+        policy_str = "The constructed policy:\n"
+
+        start_location = self.state.picked_packages[0]["package_at"]
+        goal_location = self.state.picked_packages[0]["deliver_to"]
+        unknown_state = self.get_initial_unknown_state()
+        bulk_format = "-"
+        path_cost = 0
+
+        policy_str = self._find_policy_recursive(
+            current_location=deepcopy(start_location),
+            goal_location=goal_location,
+            unknown_state=deepcopy(unknown_state),
+            bulk_format=bulk_format,
+            path_cost=path_cost,
+            policy_str=policy_str
+        )
+
+        state_utility = self.states_utilities[str(start_location)]
+        expected_value, action = state_utility.utility_value_and_action(unknown_state=unknown_state)
+        policy_str += f"Policy Expected Utility: {expected_value}\n"
+
+        return policy_str
 
     def _scan_closest_unknown_edges(self, state: State, unknown_state: list):
         # No unknown edges
@@ -280,7 +392,6 @@ class UtilityOfStates:
 
         return unknown_state
 
-    # TODO: Implement this method
     def policy_next_step(self, state: State, unknown_state: list):
         unknown_state = self._scan_closest_unknown_edges(state=state, unknown_state=unknown_state)
 
