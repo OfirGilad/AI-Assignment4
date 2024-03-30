@@ -72,8 +72,20 @@ The available options are: `0`, `1`, `2`, `3`, `4`, where:
 3. Option `2`: Generates a new graph instance and prints the given state to each fragile edge in the following format:
    ```
    Generating new graph instance...
-   Fragile edge: '(0,1) (0,2)' was set as 'blocked'.
+   Fragile edge: '(0,1) (0,2)' was set as: 'blocked'.
    Graph instance generated!
+   
+   Graph Instance State:
+   #X 4 ; Maximum x coordinate: 4
+   #Y 3 ; Maximum y coordinate: 3
+   #P 3  A 0 ; Package 0: delivered, By agent 0
+   
+   #E 0 ; Edge 0: always blocked
+   #E 0 ; Edge 1: always blocked
+   #E 0 ; Edge 2: always blocked
+   #A 0  L 0 0  A 0  S 0 ; Agent 0: Normal agent, Location: (0 0), Number of actions: 0, Score: 0
+
+   #T 0.0 ; Total Time unit passed: 0.0
    ```
 4. Option `3`: Runs simulator on the last created graph instance and report the steps the agent performed 
    in the same format as we submitted on assignment 1:
