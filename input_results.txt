@@ -122,26 +122,26 @@ Vertex (2, 2):
 # The Constructed Policy: #
 ###########################
 
-- If (Blocked['(0,0) (0,1)']=F and Blocked['(0,0) (1,0)']=F):
--- Action: 'Down' (From '(0,0)' to '(1,0)')
--- Action: 'Down' (From '(1,0)' to '(2,0)')
--- Action: 'Right' (From '(2,0)' to '(2,1)')
--- Action: 'Right' (From '(2,1)' to '(2,2)')
--- Action: 'no-op', Path cost: -4 (Goal reached)
-- If (Blocked['(0,0) (0,1)']=F and Blocked['(0,0) (1,0)']=T):
--- Action: 'Right' (From '(0,0)' to '(0,1)')
--- Action: 'Down' (From '(0,1)' to '(1,1)')
--- Action: 'Down' (From '(1,1)' to '(2,1)')
--- Action: 'Right' (From '(2,1)' to '(2,2)')
--- Action: 'no-op', Path cost: -4 (Goal reached)
-- If (Blocked['(0,0) (0,1)']=T and Blocked['(0,0) (1,0)']=F):
--- Action: 'Down' (From '(0,0)' to '(1,0)')
--- Action: 'Down' (From '(1,0)' to '(2,0)')
--- Action: 'Right' (From '(2,0)' to '(2,1)')
--- Action: 'Right' (From '(2,1)' to '(2,2)')
--- Action: 'no-op', Path cost: -4 (Goal reached)
-- If (Blocked['(0,0) (0,1)']=T and Blocked['(0,0) (1,0)']=T):
--- Action: 'no-op', Path cost: -inf (Goal might be unreachable and it's best to stop)
+-> If (Blocked['(0,0) (0,1)']=F and Blocked['(0,0) (1,0)']=F):
+->-> Action: 'Down' (From '(0,0)' to '(1,0)')
+->-> Action: 'Down' (From '(1,0)' to '(2,0)')
+->-> Action: 'Right' (From '(2,0)' to '(2,1)')
+->-> Action: 'Right' (From '(2,1)' to '(2,2)')
+->-> Action: 'no-op', Path cost: -4 (Goal reached)
+-> If (Blocked['(0,0) (0,1)']=F and Blocked['(0,0) (1,0)']=T):
+->-> Action: 'Right' (From '(0,0)' to '(0,1)')
+->-> Action: 'Down' (From '(0,1)' to '(1,1)')
+->-> Action: 'Down' (From '(1,1)' to '(2,1)')
+->-> Action: 'Right' (From '(2,1)' to '(2,2)')
+->-> Action: 'no-op', Path cost: -4 (Goal reached)
+-> If (Blocked['(0,0) (0,1)']=T and Blocked['(0,0) (1,0)']=F):
+->-> Action: 'Down' (From '(0,0)' to '(1,0)')
+->-> Action: 'Down' (From '(1,0)' to '(2,0)')
+->-> Action: 'Right' (From '(2,0)' to '(2,1)')
+->-> Action: 'Right' (From '(2,1)' to '(2,2)')
+->-> Action: 'no-op', Path cost: -4 (Goal reached)
+-> If (Blocked['(0,0) (0,1)']=T and Blocked['(0,0) (1,0)']=T):
+->-> Action: 'no-op', Path cost: -inf (Goal might be unreachable and it's best to stop)
 Policy Expected Utility: -inf
 
 ####################################
@@ -9042,72 +9042,72 @@ Vertex (5, 5):
 # The Constructed Policy: #
 ###########################
 
-- If (Blocked['(0,0) (0,1)']=F):
--- Action: 'Right' (From '(0,0)' to '(0,1)')
--- Action: 'Right' (From '(0,1)' to '(0,2)')
--- Action: 'Right' (From '(0,2)' to '(0,3)')
--- Action: 'Right' (From '(0,3)' to '(0,4)')
--- Action: 'Right' (From '(0,4)' to '(0,5)')
--- Action: 'no-op', Path cost: -5 (Goal reached)
-- If (Blocked['(0,0) (0,1)']=T):
--- Action: 'Down' (From '(0,0)' to '(1,0)')
--- If (Blocked['(1,0) (1,1)']=F):
---- Action: 'Right' (From '(1,0)' to '(1,1)')
---- Action: 'Right' (From '(1,1)' to '(1,2)')
---- Action: 'Up' (From '(1,2)' to '(0,2)')
---- Action: 'Right' (From '(0,2)' to '(0,3)')
---- Action: 'Right' (From '(0,3)' to '(0,4)')
---- Action: 'Right' (From '(0,4)' to '(0,5)')
---- Action: 'no-op', Path cost: -7 (Goal reached)
--- If (Blocked['(1,0) (1,1)']=T):
---- Action: 'Down' (From '(1,0)' to '(2,0)')
---- If (Blocked['(2,0) (2,1)']=F):
----- Action: 'Right' (From '(2,0)' to '(2,1)')
----- Action: 'Right' (From '(2,1)' to '(2,2)')
----- Action: 'Up' (From '(2,2)' to '(1,2)')
----- Action: 'Up' (From '(1,2)' to '(0,2)')
----- Action: 'Right' (From '(0,2)' to '(0,3)')
----- Action: 'Right' (From '(0,3)' to '(0,4)')
----- Action: 'Right' (From '(0,4)' to '(0,5)')
----- Action: 'no-op', Path cost: -9 (Goal reached)
---- If (Blocked['(2,0) (2,1)']=T):
----- Action: 'Down' (From '(2,0)' to '(3,0)')
----- If (Blocked['(3,0) (3,1)']=F):
------ Action: 'Right' (From '(3,0)' to '(3,1)')
------ Action: 'Right' (From '(3,1)' to '(3,2)')
------ Action: 'Up' (From '(3,2)' to '(2,2)')
------ Action: 'Up' (From '(2,2)' to '(1,2)')
------ Action: 'Up' (From '(1,2)' to '(0,2)')
------ Action: 'Right' (From '(0,2)' to '(0,3)')
------ Action: 'Right' (From '(0,3)' to '(0,4)')
------ Action: 'Right' (From '(0,4)' to '(0,5)')
------ Action: 'no-op', Path cost: -11 (Goal reached)
----- If (Blocked['(3,0) (3,1)']=T):
------ Action: 'Down' (From '(3,0)' to '(4,0)')
------ If (Blocked['(4,0) (4,1)']=F):
------- Action: 'Right' (From '(4,0)' to '(4,1)')
------- Action: 'Right' (From '(4,1)' to '(4,2)')
------- Action: 'Up' (From '(4,2)' to '(3,2)')
------- Action: 'Up' (From '(3,2)' to '(2,2)')
------- Action: 'Up' (From '(2,2)' to '(1,2)')
------- Action: 'Up' (From '(1,2)' to '(0,2)')
------- Action: 'Right' (From '(0,2)' to '(0,3)')
------- Action: 'Right' (From '(0,3)' to '(0,4)')
------- Action: 'Right' (From '(0,4)' to '(0,5)')
------- Action: 'no-op', Path cost: -13 (Goal reached)
------ If (Blocked['(4,0) (4,1)']=T):
------- Action: 'Down' (From '(4,0)' to '(5,0)')
------- Action: 'Right' (From '(5,0)' to '(5,1)')
------- Action: 'Right' (From '(5,1)' to '(5,2)')
------- Action: 'Up' (From '(5,2)' to '(4,2)')
------- Action: 'Up' (From '(4,2)' to '(3,2)')
------- Action: 'Up' (From '(3,2)' to '(2,2)')
------- Action: 'Up' (From '(2,2)' to '(1,2)')
------- Action: 'Up' (From '(1,2)' to '(0,2)')
------- Action: 'Right' (From '(0,2)' to '(0,3)')
------- Action: 'Right' (From '(0,3)' to '(0,4)')
------- Action: 'Right' (From '(0,4)' to '(0,5)')
------- Action: 'no-op', Path cost: -15 (Goal reached)
+-> If (Blocked['(0,0) (0,1)']=F):
+->-> Action: 'Right' (From '(0,0)' to '(0,1)')
+->-> Action: 'Right' (From '(0,1)' to '(0,2)')
+->-> Action: 'Right' (From '(0,2)' to '(0,3)')
+->-> Action: 'Right' (From '(0,3)' to '(0,4)')
+->-> Action: 'Right' (From '(0,4)' to '(0,5)')
+->-> Action: 'no-op', Path cost: -5 (Goal reached)
+-> If (Blocked['(0,0) (0,1)']=T):
+->-> Action: 'Down' (From '(0,0)' to '(1,0)')
+->-> If (Blocked['(1,0) (1,1)']=F):
+->->-> Action: 'Right' (From '(1,0)' to '(1,1)')
+->->-> Action: 'Right' (From '(1,1)' to '(1,2)')
+->->-> Action: 'Up' (From '(1,2)' to '(0,2)')
+->->-> Action: 'Right' (From '(0,2)' to '(0,3)')
+->->-> Action: 'Right' (From '(0,3)' to '(0,4)')
+->->-> Action: 'Right' (From '(0,4)' to '(0,5)')
+->->-> Action: 'no-op', Path cost: -7 (Goal reached)
+->-> If (Blocked['(1,0) (1,1)']=T):
+->->-> Action: 'Down' (From '(1,0)' to '(2,0)')
+->->-> If (Blocked['(2,0) (2,1)']=F):
+->->->-> Action: 'Right' (From '(2,0)' to '(2,1)')
+->->->-> Action: 'Right' (From '(2,1)' to '(2,2)')
+->->->-> Action: 'Up' (From '(2,2)' to '(1,2)')
+->->->-> Action: 'Up' (From '(1,2)' to '(0,2)')
+->->->-> Action: 'Right' (From '(0,2)' to '(0,3)')
+->->->-> Action: 'Right' (From '(0,3)' to '(0,4)')
+->->->-> Action: 'Right' (From '(0,4)' to '(0,5)')
+->->->-> Action: 'no-op', Path cost: -9 (Goal reached)
+->->-> If (Blocked['(2,0) (2,1)']=T):
+->->->-> Action: 'Down' (From '(2,0)' to '(3,0)')
+->->->-> If (Blocked['(3,0) (3,1)']=F):
+->->->->-> Action: 'Right' (From '(3,0)' to '(3,1)')
+->->->->-> Action: 'Right' (From '(3,1)' to '(3,2)')
+->->->->-> Action: 'Up' (From '(3,2)' to '(2,2)')
+->->->->-> Action: 'Up' (From '(2,2)' to '(1,2)')
+->->->->-> Action: 'Up' (From '(1,2)' to '(0,2)')
+->->->->-> Action: 'Right' (From '(0,2)' to '(0,3)')
+->->->->-> Action: 'Right' (From '(0,3)' to '(0,4)')
+->->->->-> Action: 'Right' (From '(0,4)' to '(0,5)')
+->->->->-> Action: 'no-op', Path cost: -11 (Goal reached)
+->->->-> If (Blocked['(3,0) (3,1)']=T):
+->->->->-> Action: 'Down' (From '(3,0)' to '(4,0)')
+->->->->-> If (Blocked['(4,0) (4,1)']=F):
+->->->->->-> Action: 'Right' (From '(4,0)' to '(4,1)')
+->->->->->-> Action: 'Right' (From '(4,1)' to '(4,2)')
+->->->->->-> Action: 'Up' (From '(4,2)' to '(3,2)')
+->->->->->-> Action: 'Up' (From '(3,2)' to '(2,2)')
+->->->->->-> Action: 'Up' (From '(2,2)' to '(1,2)')
+->->->->->-> Action: 'Up' (From '(1,2)' to '(0,2)')
+->->->->->-> Action: 'Right' (From '(0,2)' to '(0,3)')
+->->->->->-> Action: 'Right' (From '(0,3)' to '(0,4)')
+->->->->->-> Action: 'Right' (From '(0,4)' to '(0,5)')
+->->->->->-> Action: 'no-op', Path cost: -13 (Goal reached)
+->->->->-> If (Blocked['(4,0) (4,1)']=T):
+->->->->->-> Action: 'Down' (From '(4,0)' to '(5,0)')
+->->->->->-> Action: 'Right' (From '(5,0)' to '(5,1)')
+->->->->->-> Action: 'Right' (From '(5,1)' to '(5,2)')
+->->->->->-> Action: 'Up' (From '(5,2)' to '(4,2)')
+->->->->->-> Action: 'Up' (From '(4,2)' to '(3,2)')
+->->->->->-> Action: 'Up' (From '(3,2)' to '(2,2)')
+->->->->->-> Action: 'Up' (From '(2,2)' to '(1,2)')
+->->->->->-> Action: 'Up' (From '(1,2)' to '(0,2)')
+->->->->->-> Action: 'Right' (From '(0,2)' to '(0,3)')
+->->->->->-> Action: 'Right' (From '(0,3)' to '(0,4)')
+->->->->->-> Action: 'Right' (From '(0,4)' to '(0,5)')
+->->->->->-> Action: 'no-op', Path cost: -15 (Goal reached)
 Policy Expected Utility: -6.9375
 
 ####################################

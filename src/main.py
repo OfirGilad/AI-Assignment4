@@ -24,7 +24,7 @@ def run(data_filepath: str):
 
 def main():
     # TODO: Fill the data_filepath parameter
-    data_filepath = "../input/input2.txt"
+    data_filepath = "../input/input.txt"
     run(data_filepath=data_filepath)
 
 

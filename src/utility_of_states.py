@@ -334,7 +334,7 @@ class UtilityOfStates:
                         current_location=current_location,
                         goal_location=goal_location,
                         unknown_state=combination_unknown_state,
-                        bulk_format=f"{bulk_format}-",
+                        bulk_format=f"{bulk_format}{bulk_format}",
                         path_cost=path_cost,
                         policy_str=policy_str
                     )
@@ -347,7 +347,7 @@ class UtilityOfStates:
         start_location = self.all_packages[0]["package_at"]
         goal_location = self.all_packages[0]["deliver_to"]
         unknown_state = self.get_initial_unknown_state()
-        bulk_format = "-"
+        bulk_format = "->"
         path_cost = 0
 
         policy_str = self._find_policy_recursive(
