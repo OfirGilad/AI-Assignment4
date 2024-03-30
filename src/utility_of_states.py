@@ -16,6 +16,13 @@ class UtilityOfStates:
         self.unknown_edges_func = lambda: self.unknown_edges
         self.states_utilities = dict()
 
+        self.all_packages = (
+            self.state.packages +
+            self.state.picked_packages +
+            self.state.placed_packages +
+            self.state.archived_packages
+        )
+
     def _set_initial_values(self, goal_location):
         X = self.state.X
         Y = self.state.Y
@@ -195,8 +202,7 @@ class UtilityOfStates:
                         continue
 
     def preform_value_iteration(self):
-        # start_location = self.state.picked_packages[0]["package_at"]
-        goal_location = self.state.picked_packages[0]["deliver_to"]
+        goal_location = self.all_packages[0]["deliver_to"]
 
         # Set initial values
         self._set_initial_values(goal_location=goal_location)
@@ -338,8 +344,8 @@ class UtilityOfStates:
     def find_policy(self):
         policy_str = "The constructed policy:\n"
 
-        start_location = self.state.picked_packages[0]["package_at"]
-        goal_location = self.state.picked_packages[0]["deliver_to"]
+        start_location = self.all_packages[0]["package_at"]
+        goal_location = self.all_packages[0]["deliver_to"]
         unknown_state = self.get_initial_unknown_state()
         bulk_format = "-"
         path_cost = 0
