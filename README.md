@@ -32,13 +32,14 @@ When you run the `main` function, you will be prompted with the following option
 ```
 Choose operation from the following options:
 0. Print the value of each belief-state, and the optimal action in that belief state, if it exists.
-1. Generate new graph instance.
-2. Run simulator (Prerequisite: a graph instance must exists).
-3. Quit.
+1. Print the constructed policy.
+2. Generate new graph instance.
+3. Run simulator (Prerequisite: a graph instance must exists).
+4. Quit.
 Your choice: _
 ```
 
-The available options are: `0`, `1`, `2`, `3`, where:
+The available options are: `0`, `1`, `2`, `3`, `4`, where:
 1. Option `0`: Prints the value of each belief-state in the following format:
    ```
    Vertex (0, 0):
@@ -54,13 +55,27 @@ The available options are: `0`, `1`, `2`, `3`, where:
    Vertex (0, 1):
       etc.
    ```
-2. Option `1`: Generates a new graph instance and prints the given state to each fragile edge in the following format:
+2. Option `1`: Prints the constructed policy in the following format:
+   ```
+   The constructed policy:
+   - Action: 'Right' (From '(0,0)' to '(0,1)')
+   - If (Blocked['(0,1) (0,2)']=F):
+   -- Action: 'Down' (From '(0,1)' to '(1,1)')
+   -- etc.
+   -- Action: 'no-op', Path cost: -7 (Goal reached)
+   - If (Blocked['(0,1) (0,2)']=T):
+   -- Action: 'Down' (From '(0,1)' to '(1,1)')
+   -- etc.
+   -- Action: 'no-op', Path cost: -7 (Goal reached)
+   Policy Expected Utility: -7.0
+   ```
+3. Option `2`: Generates a new graph instance and prints the given state to each fragile edge in the following format:
    ```
    Generating new graph instance...
    Fragile edge: '(0,1) (0,2)' was set as 'blocked'.
    Graph instance generated!
    ```
-3. Option `2`: Runs simulator on the last created graph instance and report the steps the agent performed 
+4. Option `3`: Runs simulator on the last created graph instance and report the steps the agent performed 
    in the same format as we submitted on assignment 1:
    ```
    # Clock Time 0.0:
@@ -82,4 +97,4 @@ The available options are: `0`, `1`, `2`, `3`, where:
 
    #T 7.0 ; Total Time unit passed: 7.0
    ```
-4. Option `3`: Quits the program.
+5. Option `4`: Quits the program.
