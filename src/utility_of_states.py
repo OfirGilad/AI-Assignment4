@@ -207,7 +207,7 @@ class UtilityOfStates:
                             )
 
                             p = self.unknown_edges[edge_idx]["p"]
-                            q = self.unknown_edges[edge_idx]["q"]
+                            q = 1 - p
                             next_location_value = p * next_location_value_t + q * next_location_value_f
                         else:
                             raise Exception("Unknown edge state")
