@@ -9,6 +9,7 @@ from tqdm import tqdm
 
 class UtilityOfStates:
     def __init__(self, initial_state: State):
+        self.policy_bulk = "->"
         # Remove agent location for checking available paths
         self.state = initial_state.clone_state()
         self.state.agents[0]["location"] = None
@@ -118,13 +119,13 @@ class UtilityOfStates:
                 state_utility = self.states_utilities[vertex]
                 current_location = state_utility.location
 
-                # Check if state is invalid (Some unknown edges should be known)
-                state_invalid_status = self._is_state_invalid(
-                    current_location=current_location,
-                    unknown_state=unknown_state
-                )
-                if state_invalid_status:
-                    continue
+                # TEST: Skip state if invalid (Some unknown edges should be known in the vertex location)
+                # state_invalid_status = self._is_state_invalid(
+                #     current_location=current_location,
+                #     unknown_state=unknown_state
+                # )
+                # if state_invalid_status:
+                #     continue
 
                 for possible_move in possible_moves:
                     new_location = [current_location[0] + possible_move[0], current_location[1] + possible_move[1]]
@@ -367,7 +368,7 @@ class UtilityOfStates:
                         current_location=current_location,
                         goal_location=goal_location,
                         unknown_state=combination_unknown_state,
-                        bulk_format=f"{bulk_format}{bulk_format}",
+                        bulk_format=f"{bulk_format}{self.policy_bulk}",
                         path_cost=path_cost,
                         policy_str=policy_str
                     )
@@ -380,14 +381,13 @@ class UtilityOfStates:
         start_location = self.all_packages[0]["package_at"]
         goal_location = self.all_packages[0]["deliver_to"]
         unknown_state = self.get_initial_unknown_state()
-        bulk_format = "->"
         path_cost = 0
 
         policy_str = self._find_policy_recursive(
             current_location=deepcopy(start_location),
             goal_location=goal_location,
             unknown_state=deepcopy(unknown_state),
-            bulk_format=bulk_format,
+            bulk_format=self.policy_bulk,
             path_cost=path_cost,
             policy_str=policy_str
         )
