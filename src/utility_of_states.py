@@ -4,6 +4,7 @@ from state_utility import StateUtility
 import itertools
 import numpy as np
 from copy import deepcopy
+from tqdm import tqdm
 
 
 class UtilityOfStates:
@@ -68,9 +69,12 @@ class UtilityOfStates:
             except:
                 continue
 
-            if self.state.is_path_available(current_vertex=curr_location,
-                                            next_vertex=new_location,
-                                            mode="Coords"):
+            path_status = self.state.is_path_available(
+                current_vertex=curr_location,
+                next_vertex=new_location,
+                mode="Coords"
+            )
+            if path_status:
                 edge_type, edge_cost = self.state.get_edge_type_and_cost(
                     current_vertex=curr_location,
                     next_vertex=new_location,
@@ -113,9 +117,12 @@ class UtilityOfStates:
                     except:
                         continue
 
-                    if self.state.is_path_available(current_vertex=curr_location,
-                                                    next_vertex=new_location,
-                                                    mode="Coords"):
+                    path_status = self.state.is_path_available(
+                        current_vertex=curr_location,
+                        next_vertex=new_location,
+                        mode="Coords"
+                    )
+                    if path_status:
                         edge_type, edge_cost = self.state.get_edge_type_and_cost(
                             current_vertex=curr_location,
                             next_vertex=new_location,
@@ -212,7 +219,7 @@ class UtilityOfStates:
         known_states = [list(known_state) for known_state in known_states]
 
         # Update utilities under known states
-        for known_state in known_states:
+        for known_state in tqdm(known_states):
             self._update_utilities_under_unknown_state(unknown_state=known_state)
 
         # Get all possible unknown states
@@ -221,7 +228,7 @@ class UtilityOfStates:
         unknown_states.sort(key=lambda x: x.count("U"))
 
         # Update utilities under unknown states
-        for unknown_state in unknown_states:
+        for unknown_state in tqdm(unknown_states):
             self._update_utilities_under_unknown_state(unknown_state=unknown_state)
 
     def belief_states_values(self):
@@ -247,7 +254,14 @@ class UtilityOfStates:
                     unknown_state=unknown_state
                 )
                 action = "unreachable" if action is None else action
-                belief_states_str += f"  U{str(unknown_state)}={value}, Optimal Action: {action}\n"
+                belief_states_str += f"  U{str(unknown_state)}={value}, Optimal Action: {action}"
+
+                if action in ["Up", "Down", "Left", "Right"]:
+                    movement = self.state.convert_action_to_movement(action=action)
+                    next_location = (vertex[0] + movement[0], vertex[1] + movement[1])
+                    belief_states_str += f" (To '{next_location}')\n"
+                else:
+                    belief_states_str += f"\n"
 
         return belief_states_str
 

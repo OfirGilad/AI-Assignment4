@@ -4,7 +4,8 @@
 
 In order to run the code create a Python environment as follows: \
 `Python3.10` \
-`numpy==1.26.4`
+`numpy==1.26.4` \
+`tqdm==4.66.2`
 
 And to run the project:
 1. open the [main.py](src/main.py) script.
@@ -43,9 +44,9 @@ The available options are: `0`, `1`, `2`, `3`, `4`, where:
 1. Option `0`: Prints the value of each belief-state in the following format:
    ```
    Vertex (0, 0):
-     U['F']=-7.0, Optimal Action: Down
-     U['T']=-7.0, Optimal Action: Down
-     U['U']=-7.0, Optimal Action: Right
+     U['F']=-7.0, Optimal Action: Down (To '(1, 0)')
+     U['T']=-7.0, Optimal Action: Down (To '(1, 0)')
+     U['U']=-7.0, Optimal Action: Right (To '(0, 1)')
    
    Vertex (4, 3):
      U['F']=0.0, Optimal Action: no-op
