@@ -43,16 +43,6 @@ class UtilityOfStates:
             action="no-op"
         )
 
-    def _is_state_invalid(self, current_location: list, unknown_state: list):
-        _, scanned_unknown_state = self._scan_closest_fragile_edges(
-            current_location=current_location,
-            unknown_state=unknown_state
-        )
-        if "K" in scanned_unknown_state:
-            return True
-        else:
-            return False
-
     def _check_edge_state(self, fragile_edge: dict, unknown_state: list):
         for idx, unknown_edge in enumerate(self.unknown_edges):
             if unknown_edge["from"] == fragile_edge["from"] and unknown_edge["to"] == fragile_edge["to"]:
@@ -118,14 +108,6 @@ class UtilityOfStates:
             for vertex in self.states_utilities.keys():
                 state_utility = self.states_utilities[vertex]
                 current_location = state_utility.location
-
-                # TEST: Skip state if invalid (Some unknown edges should be known in the vertex location)
-                # state_invalid_status = self._is_state_invalid(
-                #     current_location=current_location,
-                #     unknown_state=unknown_state
-                # )
-                # if state_invalid_status:
-                #     continue
 
                 for possible_move in possible_moves:
                     new_location = [current_location[0] + possible_move[0], current_location[1] + possible_move[1]]
@@ -207,7 +189,7 @@ class UtilityOfStates:
                             )
 
                             p = self.unknown_edges[edge_idx]["p"]
-                            q = 1 - p
+                            q = self.unknown_edges[edge_idx]["q"]
                             next_location_value = p * next_location_value_t + q * next_location_value_f
                         else:
                             raise Exception("Unknown edge state")
