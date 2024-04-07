@@ -24,7 +24,7 @@ class UtilityOfStates:
             self.state.archived_packages
         )
 
-    def _set_initial_values(self, goal_location):
+    def _set_initial_values(self, goal_location: list):
         X = self.state.X
         Y = self.state.Y
         all_vertices = [list(vertex) for vertex in itertools.product(range(X), range(Y))]
@@ -42,7 +42,17 @@ class UtilityOfStates:
             action="no-op"
         )
 
-    def _check_edge_state(self, fragile_edge, unknown_state):
+    def _is_state_invalid(self, current_location: list, unknown_state: list):
+        _, scanned_unknown_state = self._scan_closest_fragile_edges(
+            current_location=current_location,
+            unknown_state=unknown_state
+        )
+        if "K" in scanned_unknown_state:
+            return True
+        else:
+            return False
+
+    def _check_edge_state(self, fragile_edge: dict, unknown_state: list):
         for idx, unknown_edge in enumerate(self.unknown_edges):
             if unknown_edge["from"] == fragile_edge["from"] and unknown_edge["to"] == fragile_edge["to"]:
                 return unknown_state[idx], idx
@@ -53,7 +63,7 @@ class UtilityOfStates:
 
         raise Exception("Edge not found in unknown edges (fragile edges)")
 
-    def _find_alternative_new_locations(self, curr_location, current_move, unknown_state):
+    def _find_alternative_new_locations(self, current_location: list, current_move: list, unknown_state: list):
         possible_moves = [[1, 0], [-1, 0], [0, 1], [0, -1]]
         alternative_new_locations = list()
 
@@ -61,7 +71,7 @@ class UtilityOfStates:
             if alternative_move == current_move:
                 continue
 
-            new_location = [curr_location[0] + alternative_move[0], curr_location[1] + alternative_move[1]]
+            new_location = [current_location[0] + alternative_move[0], current_location[1] + alternative_move[1]]
 
             # Validate if the new location is a vertex on the graph
             try:
@@ -70,19 +80,19 @@ class UtilityOfStates:
                 continue
 
             path_status = self.state.is_path_available(
-                current_vertex=curr_location,
+                current_vertex=current_location,
                 next_vertex=new_location,
                 mode="Coords"
             )
             if path_status:
                 edge_type, edge_cost = self.state.get_edge_type_and_cost(
-                    current_vertex=curr_location,
+                    current_vertex=current_location,
                     next_vertex=new_location,
                     mode="Coords"
                 )
                 edge_state = "F"
                 if edge_type == "fragile":
-                    fragile_edge = {"from": curr_location, "to": new_location}
+                    fragile_edge = {"from": current_location, "to": new_location}
                     edge_state, _ = self._check_edge_state(
                         fragile_edge=fragile_edge,
                         unknown_state=unknown_state
@@ -97,7 +107,7 @@ class UtilityOfStates:
 
         return alternative_new_locations
 
-    def _update_utilities_under_unknown_state(self, unknown_state):
+    def _update_utilities_under_unknown_state(self, unknown_state: list):
         possible_moves = [[1, 0], [-1, 0], [0, 1], [0, -1]]
         success_update = True
 
@@ -106,10 +116,18 @@ class UtilityOfStates:
 
             for vertex in self.states_utilities.keys():
                 state_utility = self.states_utilities[vertex]
-                curr_location = state_utility.location
+                current_location = state_utility.location
+
+                # Check if state is invalid (Some unknown edges should be known)
+                state_invalid_status = self._is_state_invalid(
+                    current_location=current_location,
+                    unknown_state=unknown_state
+                )
+                if state_invalid_status:
+                    continue
 
                 for possible_move in possible_moves:
-                    new_location = [curr_location[0] + possible_move[0], curr_location[1] + possible_move[1]]
+                    new_location = [current_location[0] + possible_move[0], current_location[1] + possible_move[1]]
 
                     # Validate if the new location is a vertex on the graph
                     try:
@@ -118,20 +136,20 @@ class UtilityOfStates:
                         continue
 
                     path_status = self.state.is_path_available(
-                        current_vertex=curr_location,
+                        current_vertex=current_location,
                         next_vertex=new_location,
                         mode="Coords"
                     )
                     if path_status:
                         edge_type, edge_cost = self.state.get_edge_type_and_cost(
-                            current_vertex=curr_location,
+                            current_vertex=current_location,
                             next_vertex=new_location,
                             mode="Coords"
                         )
                         edge_state = "F"
                         edge_idx = None
                         if edge_type == "fragile":
-                            fragile_edge = {"from": curr_location, "to": new_location}
+                            fragile_edge = {"from": current_location, "to": new_location}
                             edge_state, edge_idx = self._check_edge_state(
                                 fragile_edge=fragile_edge,
                                 unknown_state=unknown_state
@@ -156,7 +174,7 @@ class UtilityOfStates:
                             unknown_state_t = deepcopy(unknown_state)
                             unknown_state_t[edge_idx] = "T"
                             alternative_new_locations = self._find_alternative_new_locations(
-                                curr_location=curr_location,
+                                current_location=current_location,
                                 current_move=possible_move,
                                 unknown_state=unknown_state_t
                             )
@@ -194,7 +212,7 @@ class UtilityOfStates:
 
                         new_value = (-edge_cost) + next_location_value
                         action = self.state.get_action_name(
-                            current_vertex=curr_location,
+                            current_vertex=current_location,
                             next_vertex=new_location,
                             mode="Coords"
                         )
@@ -270,25 +288,26 @@ class UtilityOfStates:
         return unknown_state
 
     def _scan_closest_fragile_edges(self, current_location: list, unknown_state: list):
+        scanned_unknown_state = deepcopy(unknown_state)
         closest_not_scanned_edges_indices = list()
 
         # No unknown edges
-        if unknown_state.count("U") == 0:
-            return closest_not_scanned_edges_indices, unknown_state
+        if scanned_unknown_state.count("U") == 0:
+            return closest_not_scanned_edges_indices, scanned_unknown_state
 
         for edge_idx, edge in enumerate(self.unknown_edges):
-            if unknown_state[edge_idx] != "U":
+            if scanned_unknown_state[edge_idx] != "U":
                 continue
 
             if edge["from"] == current_location:
                 closest_not_scanned_edges_indices.append(edge_idx)
-                unknown_state[edge_idx] = "X"
+                scanned_unknown_state[edge_idx] = "K"
             elif edge["to"] == current_location:
                 closest_not_scanned_edges_indices.append(edge_idx)
-                unknown_state[edge_idx] = "X"
+                scanned_unknown_state[edge_idx] = "K"
             else:
                 continue
-        return closest_not_scanned_edges_indices, unknown_state
+        return closest_not_scanned_edges_indices, scanned_unknown_state
 
     def _find_policy_recursive(self,
                                current_location: list,
