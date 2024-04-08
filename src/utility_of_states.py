@@ -9,11 +9,15 @@ from tqdm import tqdm
 
 class UtilityOfStates:
     def __init__(self, initial_state: State):
+        # Define constants
         self.policy_bulk = "->"
+        self.possible_moves = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+
         # Remove agent location for checking available paths
         self.state = initial_state.clone_state()
         self.state.agents[0]["location"] = None
 
+        # Define auxiliary variables
         self.unknown_edges = [edge for edge in self.state.special_edges if edge["type"] == "fragile"]
         self.unknown_edges_func = lambda: self.unknown_edges
         self.states_utilities = dict()
@@ -55,10 +59,9 @@ class UtilityOfStates:
         raise Exception("Edge not found in unknown edges (fragile edges)")
 
     def _find_alternative_new_locations(self, current_location: list, current_move: list, unknown_state: list):
-        possible_moves = [[1, 0], [-1, 0], [0, 1], [0, -1]]
         alternative_new_locations = list()
 
-        for alternative_move in possible_moves:
+        for alternative_move in self.possible_moves:
             if alternative_move == current_move:
                 continue
 
@@ -99,7 +102,6 @@ class UtilityOfStates:
         return alternative_new_locations
 
     def _update_utilities_under_unknown_state(self, unknown_state: list):
-        possible_moves = [[1, 0], [-1, 0], [0, 1], [0, -1]]
         success_update = True
 
         while success_update:
@@ -109,7 +111,7 @@ class UtilityOfStates:
                 state_utility = self.states_utilities[vertex]
                 current_location = state_utility.location
 
-                for possible_move in possible_moves:
+                for possible_move in self.possible_moves:
                     new_location = [current_location[0] + possible_move[0], current_location[1] + possible_move[1]]
 
                     # Validate if the new location is a vertex on the graph
@@ -189,7 +191,7 @@ class UtilityOfStates:
                             )
 
                             p = self.unknown_edges[edge_idx]["p"]
-                            q = self.unknown_edges[edge_idx]["q"]
+                            q = 1 - p
                             next_location_value = p * next_location_value_t + q * next_location_value_f
                         else:
                             raise Exception("Unknown edge state")
