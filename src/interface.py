@@ -49,14 +49,16 @@ class Interface:
                 updated_special_edges.append(special_edge)
 
         self.graph_instance.special_edges = updated_special_edges
-        graph_instance_str += "Graph instance generated!\n"
+        graph_instance_str += (
+            f"Graph instance generated!\n\n"
+            f"Graph Instance State:\n"
+            f"{self.graph_instance}"
+        )
         print(graph_instance_str)
-        print(f"Graph Instance State:")
-        print(self.graph_instance)
 
     def _run_simulator(self):
         if self.graph_instance is None:
-            print("A graph instance must exists before running the simulator.")
+            print("A graph instance must exists before running the simulator.\n")
         else:
             simulator = Simulator(initial_state=self.graph_instance, utility_of_states=self.utility_of_states)
             simulator.run()
@@ -82,4 +84,4 @@ class Interface:
             if user_action is not None:
                 user_action()
             else:
-                print(f"Invalid input: {user_input}! Write either '0','1','2', '3' or '4'. \n")
+                print(f"Invalid input: {user_input}! Write either '0','1','2', '3' or '4'.\n")
