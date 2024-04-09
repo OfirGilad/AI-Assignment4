@@ -118,3 +118,4 @@ See the file [input_results.txt](input_results.txt) for the example runs of the 
 in the following input files:
 - [input1.txt](input%2Finput1.txt)
 - [input2.txt](input%2Finput2.txt)
+- [input3.txt](input%2Finput3.txt)

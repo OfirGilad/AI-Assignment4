@@ -1,8 +1,8 @@
 Non-trivial example runs on at least 2 scenarios, including the input and output:
 
-####################################################################
-# 1. Every edge is fragile and every vertex may contain a package. #
-####################################################################
+#################################
+# 1. Goal might be unreachable. #
+#################################
 
 ##########
 # Input: #
@@ -186,8 +186,130 @@ Final State:
 
 #T 4.0 ; Total Time unit passed: 4.0
 
+##################################
+# 2. Taking a risk is preferred. #
+##################################
+
+##########
+# Input: #
+##########
+
+#X 1                ; Maximum x coordinate
+#Y 3                ; Maximum y coordinate
+#P 0 0 0  D 0 3 50  ; Package at (0,0) from time 0, deliver to (0,3) on or before time 50
+#B 0 1 1 1          ; Edge from (0,1) to (1,1) is blocked
+#B 0 2 1 2          ; Edge from (0,2) to (1,2) is blocked
+#F 0 2 0 3 0.2      ; Edge from (0,2) to (0,3) is fragile, blocked with probability 0.2
+#A 0 0              ; Normal agent starts at (0,0)
+
+#########################
+# Belief States Values: #
+#########################
+
+Vertex (0, 0):
+  U['F']=-3.0, Optimal Action: Right (To '(0, 1)')
+  U['T']=-5.0, Optimal Action: Down (To '(1, 0)')
+  U['U']=-4.2, Optimal Action: Right (To '(0, 1)')
+
+Vertex (0, 1):
+  U['F']=-2.0, Optimal Action: Right (To '(0, 2)')
+  U['T']=-6.0, Optimal Action: Left (To '(0, 0)')
+  U['U']=-3.2, Optimal Action: Right (To '(0, 2)')
+
+Vertex (0, 2):
+  U['F']=-1.0, Optimal Action: Right (To '(0, 3)')
+  U['T']=-7.0, Optimal Action: Left (To '(0, 1)')
+  U['U']=-2.2, Optimal Action: Right (To '(0, 3)')
+
+Vertex (0, 3):
+  U['F']=0.0, Optimal Action: no-op
+  U['T']=0.0, Optimal Action: no-op
+  U['U']=0.0, Optimal Action: no-op
+
+Vertex (1, 0):
+  U['F']=-4.0, Optimal Action: Up (To '(0, 0)')
+  U['T']=-4.0, Optimal Action: Right (To '(1, 1)')
+  U['U']=-4.0, Optimal Action: Right (To '(1, 1)')
+
+Vertex (1, 1):
+  U['F']=-3.0, Optimal Action: Right (To '(1, 2)')
+  U['T']=-3.0, Optimal Action: Right (To '(1, 2)')
+  U['U']=-3.0, Optimal Action: Right (To '(1, 2)')
+
+Vertex (1, 2):
+  U['F']=-2.0, Optimal Action: Right (To '(1, 3)')
+  U['T']=-2.0, Optimal Action: Right (To '(1, 3)')
+  U['U']=-2.0, Optimal Action: Right (To '(1, 3)')
+
+Vertex (1, 3):
+  U['F']=-1.0, Optimal Action: Up (To '(0, 3)')
+  U['T']=-1.0, Optimal Action: Up (To '(0, 3)')
+  U['U']=-1.0, Optimal Action: Up (To '(0, 3)')
+
+###########################
+# The Constructed Policy: #
+###########################
+
+-> Action: 'Right' (From '(0,0)' to '(0,1)')
+-> Action: 'Right' (From '(0,1)' to '(0,2)')
+-> If (Blocked['(0,2) (0,3)']=F):
+->-> Action: 'Right' (From '(0,2)' to '(0,3)')
+->-> Action: 'no-op', Path cost: -3 (Goal reached)
+-> If (Blocked['(0,2) (0,3)']=T):
+->-> Action: 'Left' (From '(0,2)' to '(0,1)')
+->-> Action: 'Left' (From '(0,1)' to '(0,0)')
+->-> Action: 'Down' (From '(0,0)' to '(1,0)')
+->-> Action: 'Right' (From '(1,0)' to '(1,1)')
+->-> Action: 'Right' (From '(1,1)' to '(1,2)')
+->-> Action: 'Right' (From '(1,2)' to '(1,3)')
+->-> Action: 'Up' (From '(1,3)' to '(0,3)')
+->-> Action: 'no-op', Path cost: -9 (Goal reached)
+Policy Expected Utility: -4.2
+
+####################################
+# Example graph instance creation: #
+####################################
+
+Generating new graph instance...
+Fragile edge: '(0,2) (0,3)' was set as: 'unblocked'.
+Graph instance generated!
+
+Graph Instance State:
+#X 1 ; Maximum x coordinate: 1
+#Y 3 ; Maximum y coordinate: 3
+#P 2  A 0 ; Package 0: picked, By agent: 0
+
+#E 0 ; Edge 0: always blocked
+#E 0 ; Edge 1: always blocked
+#A 0  L 0 0  A 0  S 0 ; Agent 0: Normal agent, Location: (0 0), Number of actions: 0, Score: 0
+
+#T 0.0 ; Total Time unit passed: 0.0
+
+######################################
+# Example graph instance simulation: #
+######################################
+
+# Clock Time 0.0:
+Agent 0 (Normal) Action: Right
+# Clock Time 1.0:
+Agent 0 (Normal) Action: Right
+# Clock Time 2.0:
+Agent 0 (Normal) Action: Right
+# Clock Time 3.0:
+Goal achieved: All available packages have been delivered or disappeared
+Final State:
+#X 1 ; Maximum x coordinate: 1
+#Y 3 ; Maximum y coordinate: 3
+#P 3  A 0 ; Package 0: delivered, By agent 0
+
+#E 0 ; Edge 0: always blocked
+#E 0 ; Edge 1: always blocked
+#A 0  L 0 3  A 3  S 1 ; Agent 0: Normal agent, Location: (0 3), Number of actions: 3, Score: 1
+
+#T 3.0 ; Total Time unit passed: 3.0
+
 ##################################################################
-# 2. Max size grid (6 by 6) with 5 possible uncertain blockages. #
+# 3. Max size grid (6 by 6) with 5 possible uncertain blockages. #
 ##################################################################
 
 ##########
