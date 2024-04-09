@@ -338,8 +338,6 @@ Final State:
 # Belief States Values: #
 #########################
 
-Belief States Values:
-
 Vertex (0, 0):
   U['F', 'F', 'F', 'F', 'F']=-5.0, Optimal Action: Right (To '(0, 1)')
   U['F', 'F', 'F', 'F', 'T']=-5.0, Optimal Action: Right (To '(0, 1)')
